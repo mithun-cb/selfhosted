@@ -1,0 +1,27 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - ollama:/root/.ollama
+    cpus: "3.2"         # 80% of 4 CPUs
+    mem_limit: "21.6g"  # 90% of 24 GB RAM
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    ports:
+      - "3080:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=mysecret   # optional: enable login security
+    volumes:
+      - open-webui:/app/backend/data
+
+volumes:
+  ollama: {}
+  open-webui: {}
